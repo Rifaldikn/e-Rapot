@@ -1,25 +1,37 @@
-const SchoolModel = require('../models/')
+// const bcrypt = require('bcrypt-nodejs')
+// const crypto = require('crypto')
+const mongoose = require('mongoose')
+var Schema = mongoose.Schema
 
-exports.initSchool = (req, res, next) => {
-  const school = new SchoolModel({
-    schoolName: req.body.schoolName,
-    npsn: req.body.npsn,
-    address: req.body.address,
-    district: req.body.district,
-    city: req.body.city,
-    province: req.body.province,
-    website: req.body.website,
-    email: req.body.email
+const schoolSchema = new Schema(
+  {
+    schoolName: String,
+    npsn: Number,
+    schoolAddress: String,
+    zip: Number,
+    phone: Number,
+    kelurahan: String,
+    district: String,
+    province: String,
+    email: String,
+    website: String
+  }
+)
 
-  })
-  SchoolModel.count({}, function (err, count) {
-    if (count) {
-      res.json({ status: '302', msg: "already registered"})
-    } else{
-      school.save((err) => {
-   if (err) { return next(err) }
-   res.json({ status: '200', data: school })
- })
+const userSchema = new Schema(
+  {
+    profile: {
+        firstname: String,
+        lastname: String,
     }
-  })
+  }
+
+)
+const School = mongoose.model('School', schoolSchema)
+const User = mongoose.model('User', userSchema)
+
+
+module.exports = {
+  School,
+  User
 }

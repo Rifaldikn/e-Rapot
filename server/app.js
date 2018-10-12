@@ -19,7 +19,7 @@ const app = express()
 /**
  * Controllers (route handlers).
  */
-const schoolController = require('./controllers/school')
+const schoolController = require('./controllers/')
 
 /**
  * Express configuration.
