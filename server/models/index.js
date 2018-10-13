@@ -56,7 +56,7 @@ const userSchema = new Schema({
           enum: ['admin', 'teacher', 'student']
         }
       ],
-      default: [C.ROLE_USER]
+      default: ['student']
     },
     lastLogin: {
       type: Date
