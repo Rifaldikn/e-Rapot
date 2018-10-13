@@ -17,7 +17,7 @@ exports.initSchool = (req, res, next) => {
 
   models.School.count({}, function (err, count) {
     if (count) {
-      res.json({ status: '302', msg: 'already registered'})
+      res.status(409).send({ error: 'School is already exist' })
     } else {
       school.save((err) => {
         if (err) { return next(err) }
@@ -27,6 +27,28 @@ exports.initSchool = (req, res, next) => {
   })
 }
 
-exports.createuser(req, res, next){
-  
+exports.createUser = (req, res, next) => {
+  const account = new models.User({
+    profile: {
+      firstname: req.body.firstname,
+      lastname: req.body.lastname
+    },
+    account: {
+      username: req.body.username,
+      password: req.body.password,
+      email: req.body.email
+    }
+  })
+
+  models.User.findOne({ email: req.body.email }, (err, existingUser) => {
+    if (err) { return next(err) }
+    if (existingUser) {
+      res.status(409).send({ error: 'Account is already exist' })
+    }    else {
+      account.save((err) => {
+      if (err) { return next(err) }
+      res.json({ status: '200', account: account })
+    })
+    }
+  })
 }
