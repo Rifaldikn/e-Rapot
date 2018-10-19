@@ -52,8 +52,7 @@ app.set('port', process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 8080)
  * Primary app routes.
  */
 app.post('/postSchool', controllers.postSchool)
-app.post('/postUser', controllers.postUser)
-app.get('/testdoang', controllers.testdoang)
+app.post('/postAccount', controllers.postAccount)
 
 
 /**

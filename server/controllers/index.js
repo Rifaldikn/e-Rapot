@@ -1,5 +1,4 @@
 const models = require('../models/')
-
 /**
  * School config
  */
@@ -18,7 +17,9 @@ exports.postSchool = (req, res, next) => {
   })
 
   models.School.count({}, function (err, count) {
-    if (err) { return next(err)}
+    if (err) {
+      return next(err)
+    }
     if (count) {
       res.status(409).send({ error: 'School data is already exist' })
     } else {
@@ -38,25 +39,19 @@ exports.testdoang = (req, res, next) => {
 }
 
 /**
- * User Signup
+ * Account Signup
  */
-exports.postUser = (req, res, next) => {
-  const account = new models.User({
-    profile: {
-      firstname: req.body.firstname,
-      lastname: req.body.lastname
-    },
-    account: {
-      username: req.body.username,
-      password: req.body.password,
-      email: req.body.email,
-      roles: req.body.roles,
-      lastLogin: Date.now(),
-      created: Date.now()
-    }
+exports.postAccount = (req, res, next) => {
+  const account = new models.Account({
+    username: req.body.username,
+    password: req.body.password,
+    email: req.body.email,
+    role: req.body.role,
+    lastLogin: Date.now(),
+    created: Date.now()
   })
 
-  models.User.findOne(
+  models.Account.findOne(
     { email: req.body.email } || { username: req.body.email },
     (err, existingUser) => {
       if (err) {
@@ -74,4 +69,4 @@ exports.postUser = (req, res, next) => {
       }
     }
   )
-};
+}

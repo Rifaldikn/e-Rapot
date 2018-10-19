@@ -1,5 +1,5 @@
-// const bcrypt = require('bcrypt-nodejs')
-// const crypto = require('crypto')
+const bcrypt = require('bcrypt')
+const crypto = require('crypto')
 const mongoose = require('mongoose')
 var Schema = mongoose.Schema
 
@@ -18,6 +18,7 @@ const schoolSchema = new Schema({
   email: String,
   website: String
 })
+/** ****************************************************************** */
 
 /**
  * Class schema to save information about class, student in it
@@ -36,73 +37,90 @@ const classSchema = new Schema({
     default: []
   }
 })
+/** ****************************************************************** */
 
 /**
  * User or person schema, will be inherite to studend and teacher schemas
  */
 const userSchema = new Schema({
-  profile: {
-    firstname: String,
-    lastname: String,
-    birthDate: String,
-    birthPlace: String,
-    gender: String,
-    religion: {
-      type: String,
-      default: 'islam'
-    },
-    rt: Number,
-    rw: Number,
-    kelurahan: String,
-    district: String,
-    province: String,
-    phone: String
+  firstname: String,
+  lastname: String,
+  birthDate: String,
+  birthPlace: String,
+  gender: String,
+  religion: {
+    type: String,
+    default: 'islam'
   },
+  rt: Number,
+  rw: Number,
+  kelurahan: String,
+  district: String,
+  province: String,
+  phone: String,
   account: {
-    email: {
-      type: String,
-      trim: true,
-      unique: true,
-      lowercase: true,
-      default: '',
-      match: [/.+\@.+\..+/, 'Please fill a valid email address']
-    },
-    username: {
-      type: String,
-      unique: true,
-      lowercase: true,
-      required: 'Please fill in a username',
-      trim: true,
-      match: [/^[\w][\w\-\._\@]*[\w]$/, 'Please fill a valid username']
-    },
-    password: {
-      type: String,
-      default: '',
-      required: 'Please fill in a password'
-    },
-    profile: {
-      name: { type: String },
-      gender: { type: String },
-      picture: { type: String }
-    },
-    role: {
-      type: Number,
-      default: 3
-    },
-    lastLogin: {
-      type: Date
-    },
-    created: Date,
-    locale: {
-      type: String
-    },
-    status: {
-      type: Number,
-      default: 1
-    }
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Account'
   }
 })
+/** ****************************************************************** */
 
+const accountSchema = new Schema({
+  email: {
+    type: String,
+    trim: true,
+    unique: true,
+    lowercase: true,
+    default: '',
+    match: [/.+\@.+\..+/, 'Please fill a valid email address']
+  },
+  username: {
+    type: String,
+    unique: true,
+    lowercase: true,
+    required: 'Please fill in a username',
+    trim: true,
+    match: [/^[\w][\w\-\._\@]*[\w]$/, 'Please fill a valid username']
+  },
+  password: {
+    type: String,
+    default: '',
+    required: 'Please fill in a password'
+  },
+  role: {
+    type: Number,
+    default: 2
+  },
+  lastLogin: {
+    type: Date
+  },
+  created: Date
+})
+/**
+ * Password hashing.
+ */
+accountSchema.pre('save', function (next) {
+  const account = this
+  const SALT_WORK_FACTOR = 10
+  // only hash the password if it has been modified (or is new)
+  if (!account.isModified('password')) return next()
+
+  // generate a salt
+  bcrypt.genSalt(SALT_WORK_FACTOR, function (err, salt) {
+    if (err) return next(err)
+
+    // hash the password using our new salt
+    bcrypt.hash(account.password, salt, function (err, hash) {
+      if (err) return next(err)
+
+      // override the cleartext password with the hashed one
+      account.password = hash
+      next()
+    })
+  })
+})
+
+/** ****************************************************************** */
 /**
  * Teacher schema
  */
@@ -113,10 +131,19 @@ const teacherSchema = new Schema({
   status: String,
   subject: String,
   status: String,
-  class: Array
+  class: Array,
+  profile: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  }
 })
+/** ****************************************************************** */
 
 const studentSchema = new Schema({
+  profile: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  },
   nisn: Number,
   nik: Number,
   childStatus: String,
@@ -149,6 +176,7 @@ const studentSchema = new Schema({
     address: String
   }
 })
+/** ****************************************************************** */
 
 const subjecSchema = new Schema({
   name: String,
@@ -162,9 +190,11 @@ const subjecSchema = new Schema({
   },
   passGrade: Number
 })
+/** ****************************************************************** */
 
 const School = mongoose.model('School', schoolSchema)
 const User = mongoose.model('User', userSchema)
+const Account = mongoose.model('Account', accountSchema)
 const Teacher = mongoose.model('Teacher', teacherSchema)
 const Classes = mongoose.model('Classes', classSchema)
 const Subject = mongoose.model('Subject', subjecSchema)
@@ -176,5 +206,6 @@ module.exports = {
   Teacher,
   Classes,
   Subject,
-  Stundet
+  Student,
+  Account
 }
