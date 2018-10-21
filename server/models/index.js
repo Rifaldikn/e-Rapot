@@ -1,5 +1,5 @@
 const bcrypt = require('bcrypt')
-const crypto = require('crypto')
+// const crypto = require('crypto')
 const mongoose = require('mongoose')
 var Schema = mongoose.Schema
 
@@ -50,7 +50,7 @@ const userSchema = new Schema({
   gender: String,
   religion: {
     type: String,
-    default: 'islam'
+    default: 'Islam'
   },
   rt: Number,
   rw: Number,
@@ -63,9 +63,16 @@ const userSchema = new Schema({
     ref: 'Account'
   }
 })
+
+// JSON Profile
+
 /** ****************************************************************** */
 
 const accountSchema = new Schema({
+  profile: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  },
   email: {
     type: String,
     trim: true,
@@ -96,9 +103,18 @@ const accountSchema = new Schema({
   },
   created: Date
 })
+
 /**
- * Password hashing.
+ * Helper method for validating user's password.
  */
+accountSchema.methods.comparePassword = function (candidatePassword, cb) {
+  bcrypt.compare(candidatePassword, this.password, function (err, isMatch) {
+    if (err) return cb(err)
+    cb(null, isMatch)
+  })
+};
+
+// Password hashing
 accountSchema.pre('save', function (next) {
   const account = this
   const SALT_WORK_FACTOR = 10
@@ -178,7 +194,7 @@ const studentSchema = new Schema({
 })
 /** ****************************************************************** */
 
-const subjecSchema = new Schema({
+const subjectSchema = new Schema({
   name: String,
   teachers: {
     type: Array,
@@ -197,7 +213,7 @@ const User = mongoose.model('User', userSchema)
 const Account = mongoose.model('Account', accountSchema)
 const Teacher = mongoose.model('Teacher', teacherSchema)
 const Classes = mongoose.model('Classes', classSchema)
-const Subject = mongoose.model('Subject', subjecSchema)
+const Subject = mongoose.model('Subject', subjectSchema)
 const Student = mongoose.model('Student', studentSchema)
 
 module.exports = {

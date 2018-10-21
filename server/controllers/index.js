@@ -1,7 +1,9 @@
 const models = require('../models/')
 /**
- * School config
+ * School Controllers
  */
+
+//  init config school
 exports.postSchool = (req, res, next) => {
   const school = new models.School({
     schoolName: req.body.schoolName,
@@ -31,24 +33,22 @@ exports.postSchool = (req, res, next) => {
       })
     }
   })
-}
-
-exports.testdoang = (req, res, next) => {
-  var test = new models.School()
-  test.testdoang(res)
-}
-
+};
+/** ****************************************************************** */
 /**
- * Account Signup
+ * Account Controllers
  */
+
+// signup account
 exports.postAccount = (req, res, next) => {
-  const account = new models.Account({
+  var account = new models.Account({
     username: req.body.username,
     password: req.body.password,
     email: req.body.email,
     role: req.body.role,
     lastLogin: Date.now(),
-    created: Date.now()
+    created: Date.now(),
+    profile: req.body.profile
   })
 
   models.Account.findOne(
@@ -69,4 +69,66 @@ exports.postAccount = (req, res, next) => {
       }
     }
   )
-}
+};
+
+// login account
+exports.postLogin = (req, res, next) => {
+  models.Account.findOne(
+    { email: req.body.email } || { username: req.body.email },
+    (err, account) => {
+      if (err) {
+        return next(err)
+      }
+      if (!account) {
+        return next(null, false, { msg: `Email ${email} not found.` })
+      }
+      account.comparePassword(req.body.password, (err, isMatch) => {
+        if (err) {
+          return next(err)
+        }
+        if (isMatch) {
+          req.session.account = account
+          return next(account)
+        }
+        return next({ msg: 'Invalid email or password.' })
+      })
+    }
+  )
+};
+
+exports.postUser = (req, res, next) => {
+  var user = new models.User({
+    firstname: req.body.firstname,
+    lastname: req.body.lastname,
+    birthDate: req.body.birthDate,
+    birthPlace: req.body.birthPlace,
+    gender: req.body.gender,
+    religion: req.body.religion,
+    rt: req.body.rt,
+    rw: req.body.rw,
+    kelurahan: req.body.kelurahan,
+    district: req.body.distrct,
+    province: req.body.province,
+    phone: req.body.phone,
+    account: req.body.accountId
+  })
+  if (req.body.accountId) {
+    models.Account.findOne({ _id: req.body.accountId }, (err, account) => {
+      if (err) {
+        return next(err)
+      } else {
+        account.set({ profile: user._id })
+        account.save(function (err, updatedAccount) {
+          if (err) return next(err)
+          res.send(updatedAccount)
+        })
+      }
+    })
+  }
+  user.save(err => {
+    if (err) {
+      return next(err)
+    }
+    res.json({ status: '200', user: user })
+  })
+};
