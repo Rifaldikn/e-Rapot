@@ -1,7 +1,7 @@
-const bcrypt = require('bcrypt')
+const bcrypt = require("bcrypt");
 // const crypto = require('crypto')
-const mongoose = require('mongoose')
-var Schema = mongoose.Schema
+const mongoose = require("mongoose");
+var Schema = mongoose.Schema;
 
 /**
  * School schema, to save information and configutration about school
@@ -17,7 +17,7 @@ const schoolSchema = new Schema({
   province: String,
   email: String,
   website: String
-})
+});
 /** ****************************************************************** */
 
 /**
@@ -36,7 +36,7 @@ const classSchema = new Schema({
     type: Array,
     default: []
   }
-})
+});
 /** ****************************************************************** */
 
 /**
@@ -50,7 +50,7 @@ const userSchema = new Schema({
   gender: String,
   religion: {
     type: String,
-    default: 'Islam'
+    default: "Islam"
   },
   rt: Number,
   rw: Number,
@@ -60,9 +60,9 @@ const userSchema = new Schema({
   phone: String,
   account: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Account'
+    ref: "Account"
   }
-})
+});
 
 // JSON Profile
 
@@ -71,28 +71,28 @@ const userSchema = new Schema({
 const accountSchema = new Schema({
   profile: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User'
+    ref: "User"
   },
   email: {
     type: String,
     trim: true,
     unique: true,
     lowercase: true,
-    default: '',
-    match: [/.+\@.+\..+/, 'Please fill a valid email address']
+    default: "",
+    match: [/.+\@.+\..+/, "Please fill a valid email address"]
   },
   username: {
     type: String,
     unique: true,
     lowercase: true,
-    required: 'Please fill in a username',
+    required: "Please fill in a username",
     trim: true,
-    match: [/^[\w][\w\-\._\@]*[\w]$/, 'Please fill a valid username']
+    match: [/^[\w][\w\-\._\@]*[\w]$/, "Please fill a valid username"]
   },
   password: {
     type: String,
-    default: '',
-    required: 'Please fill in a password'
+    default: "",
+    required: "Please fill in a password"
   },
   role: {
     type: Number,
@@ -102,39 +102,43 @@ const accountSchema = new Schema({
     type: Date
   },
   created: Date
-})
+});
 
 /**
  * Helper method for validating user's password.
  */
-accountSchema.methods.comparePassword = function (candidatePassword, cb) {
-  bcrypt.compare(candidatePassword, this.password, function (err, isMatch) {
-    if (err) return cb(err)
-    cb(null, isMatch)
-  })
+accountSchema.methods.comparePassword = function(candidatePassword, cb) {
+  bcrypt.compare(candidatePassword, this.password, function(err, isMatch) {
+    if (err) return cb(err);
+    cb(null, isMatch);
+  });
+};
+
+accountSchema.methods.getAccountData = function() {
+  return this.email
 };
 
 // Password hashing
-accountSchema.pre('save', function (next) {
-  const account = this
-  const SALT_WORK_FACTOR = 10
+accountSchema.pre("save", function(next) {
+  const account = this;
+  const SALT_WORK_FACTOR = 10;
   // only hash the password if it has been modified (or is new)
-  if (!account.isModified('password')) return next()
+  if (!account.isModified("password")) return next();
 
   // generate a salt
-  bcrypt.genSalt(SALT_WORK_FACTOR, function (err, salt) {
-    if (err) return next(err)
+  bcrypt.genSalt(SALT_WORK_FACTOR, function(err, salt) {
+    if (err) return next(err);
 
     // hash the password using our new salt
-    bcrypt.hash(account.password, salt, function (err, hash) {
-      if (err) return next(err)
+    bcrypt.hash(account.password, salt, function(err, hash) {
+      if (err) return next(err);
 
       // override the cleartext password with the hashed one
-      account.password = hash
-      next()
-    })
-  })
-})
+      account.password = hash;
+      next();
+    });
+  });
+});
 
 /** ****************************************************************** */
 /**
@@ -150,15 +154,15 @@ const teacherSchema = new Schema({
   class: Array,
   profile: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User'
+    ref: "User"
   }
-})
+});
 /** ****************************************************************** */
 
 const studentSchema = new Schema({
   profile: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User'
+    ref: "User"
   },
   nisn: Number,
   nik: Number,
@@ -191,7 +195,7 @@ const studentSchema = new Schema({
     phone: String,
     address: String
   }
-})
+});
 /** ****************************************************************** */
 
 const subjectSchema = new Schema({
@@ -205,16 +209,16 @@ const subjectSchema = new Schema({
     default: []
   },
   passGrade: Number
-})
+});
 /** ****************************************************************** */
 
-const School = mongoose.model('School', schoolSchema)
-const User = mongoose.model('User', userSchema)
-const Account = mongoose.model('Account', accountSchema)
-const Teacher = mongoose.model('Teacher', teacherSchema)
-const Classes = mongoose.model('Classes', classSchema)
-const Subject = mongoose.model('Subject', subjectSchema)
-const Student = mongoose.model('Student', studentSchema)
+const School = mongoose.model("School", schoolSchema);
+const User = mongoose.model("User", userSchema);
+const Account = mongoose.model("Account", accountSchema);
+const Teacher = mongoose.model("Teacher", teacherSchema);
+const Classes = mongoose.model("Classes", classSchema);
+const Subject = mongoose.model("Subject", subjectSchema);
+const Student = mongoose.model("Student", studentSchema);
 
 module.exports = {
   School,
@@ -224,4 +228,4 @@ module.exports = {
   Subject,
   Student,
   Account
-}
+};

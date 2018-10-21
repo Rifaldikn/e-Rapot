@@ -1,4 +1,4 @@
-const models = require('../models/')
+const models = require("../models/");
 /**
  * School Controllers
  */
@@ -16,23 +16,23 @@ exports.postSchool = (req, res, next) => {
     province: req.body.province,
     email: req.body.email,
     website: req.body.website
-  })
+  });
 
-  models.School.count({}, function (err, count) {
+  models.School.count({}, function(err, count) {
     if (err) {
-      return next(err)
+      return next(err);
     }
     if (count) {
-      res.status(409).send({ error: 'School data is already exist' })
+      res.status(409).send({ error: "School data is already exist" });
     } else {
       school.save(err => {
         if (err) {
-          return next(err)
+          return next(err);
         }
-        res.json({ status: '200', data: school })
-      })
+        res.json({ status: "200", data: school });
+      });
     }
-  })
+  });
 };
 /** ****************************************************************** */
 /**
@@ -49,26 +49,49 @@ exports.postAccount = (req, res, next) => {
     lastLogin: Date.now(),
     created: Date.now(),
     profile: req.body.profile
-  })
-
+  });
+  console.log()
   models.Account.findOne(
-    { email: req.body.email } || { username: req.body.email },
+    { email: account.email } || { username: account.username },
     (err, existingUser) => {
       if (err) {
-        return next(err)
+        return next(err);
       }
       if (existingUser) {
-        res.status(409).send({ error: 'Account is already exist' })
+        res.status(409).send({ error: "Account is already exist" });
       } else {
         account.save(err => {
           if (err) {
-            return next(err)
+            return next(err);
           }
-          res.json({ status: '200', account: account })
-        })
+          res.json({ status: "200", account: account });
+        });
       }
     }
+  );
+};
+
+// get all account
+exports.getAccount = (req, res, next) => {
+  // var usersProjection = ;
+  models.Account.find(
+    {},
+    {
+      __v: false,
+      _id: false,
+      password: false
+    }
   )
+    .populate({
+      path: "profile",
+      select: "_id"
+    })
+    .exec((err, accounts) => {
+      if (err) {
+        return next(err);
+      }
+      res.json(accounts);
+    });
 };
 
 // login account
@@ -77,25 +100,26 @@ exports.postLogin = (req, res, next) => {
     { email: req.body.email } || { username: req.body.email },
     (err, account) => {
       if (err) {
-        return next(err)
+        return next(err);
       }
       if (!account) {
-        return next(null, false, { msg: `Email ${email} not found.` })
+        return next(null, false, { msg: `Email ${email} not found.` });
       }
       account.comparePassword(req.body.password, (err, isMatch) => {
         if (err) {
-          return next(err)
+          return next(err);
         }
         if (isMatch) {
-          req.session.account = account
-          return next(account)
+          req.session.account = account;
+          return next(account);
         }
-        return next({ msg: 'Invalid email or password.' })
-      })
+        return next({ msg: "Invalid email or password." });
+      });
     }
-  )
+  );
 };
 
+// create user profile
 exports.postUser = (req, res, next) => {
   var user = new models.User({
     firstname: req.body.firstname,
@@ -111,24 +135,24 @@ exports.postUser = (req, res, next) => {
     province: req.body.province,
     phone: req.body.phone,
     account: req.body.accountId
-  })
+  });
   if (req.body.accountId) {
     models.Account.findOne({ _id: req.body.accountId }, (err, account) => {
       if (err) {
-        return next(err)
+        return next(err);
       } else {
-        account.set({ profile: user._id })
-        account.save(function (err, updatedAccount) {
-          if (err) return next(err)
-          res.send(updatedAccount)
-        })
+        account.set({ profile: user._id });
+        account.save(function(err, updatedAccount) {
+          if (err) return next(err);
+          res.send(updatedAccount);
+        });
       }
-    })
+    });
   }
   user.save(err => {
     if (err) {
-      return next(err)
+      return next(err);
     }
-    res.json({ status: '200', user: user })
-  })
+    res.json({ status: "200", user: user });
+  });
 };

@@ -92,6 +92,8 @@ app.post('/postSchool', controllers.postSchool)
 app.post('/postAccount', controllers.postAccount)
 app.post('/postLogin', controllers.postLogin)
 app.post('/postUser', controllers.postUser)
+app.get('/getAccount', controllers.getAccount)
+
 
 /**
  * Start Express server.
