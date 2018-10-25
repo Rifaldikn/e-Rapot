@@ -164,14 +164,12 @@ const studentSchema = new Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "User"
   },
+  name: String,
   nisn: Number,
   nik: Number,
   childStatus: String,
   childTh: Number,
-  schools: {
-    type: Array,
-    default: []
-  },
+  schoolsFrom: String,
   class: String,
   dateIn: Date,
   parent: {
@@ -181,7 +179,7 @@ const studentSchema = new Schema({
       phone: String,
       address: String
     },
-    motherName: {
+    mother: {
       name: String,
       works: String,
       phone: String,

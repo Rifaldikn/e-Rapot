@@ -91,9 +91,11 @@ app.set('port', process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 8080)
 app.post('/postSchool', controllers.postSchool)
 app.post('/postAccount', controllers.postAccount)
 app.post('/postLogin', controllers.postLogin)
+app.post('/postTeacher', controllers.postTeacher)
+app.post('/postStudent', controllers.postStudent)
 app.post('/postUser', controllers.postUser)
+app.post('/postSubject', controllers.postSubject)
 app.get('/getAccount', controllers.getAccount)
-
 
 /**
  * Start Express server.
